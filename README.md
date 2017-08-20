@@ -3,7 +3,7 @@
 A very fast, cool, small, powerful,easy use ORM SQLite framework for Android. You can use it to add,delete,update,query sqlite by object entity,just 
 a singleLine of code to make it Efficient.It's powerful and easy use than GreenDao,ActiveAndroid and so on.
 
-SmartSQLite是一款强大的ORM数据库（对象关系映射，英语：Object Relational Mapping，简称ORM，或O/RM，或O/R mapping），那么有多么强大呢？
+SmartSQLite是一款强大的ORM数据库（对象关系映射，英语：Object Relational Mapping，简称ORM，或O/RM，或O/R mapping），灵感来源：因为Android每次编写数据库太麻烦，操作也麻烦，数据库升级也非常麻烦，目前的数据库框架用起来非常麻烦，效率低，如GreenDao、ActiveAndroid等，所以决定按照面向对象ORM思想自己写一个高效的库，这应该是目前Android最强大，效率最高的，学习成本最低的数据库框架了吧？那么有多么强大呢？
 
 # 1.SmartSQLite功能简介
 
