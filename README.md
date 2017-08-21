@@ -31,7 +31,7 @@ allprojects {
 </pre></code>
 
 <pre><code>
-    compile 'com.github.jaychou2012:SmartSQLite:1.0.0.1'
+    compile 'com.github.jaychou2012:SmartSQLite:1.0.0.2'
 </pre></code>
 
 1.创建实体类，例如在entity文件夹新建一个Student类，只需继承TableObject，如果实体无法继承，请看Demo的第二种方案，实现接口TableEntity即可：
