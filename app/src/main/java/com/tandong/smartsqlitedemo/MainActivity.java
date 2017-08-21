@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.tandong.smartsqlite.utils.SmartSQLite;
 import com.tandong.smartsqlitedemo.entity.Student;
 import com.tandong.smartsqlitedemo.entity.Teacher;
 
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         student.setTimeLong(200);
         student.save(this);
 //        student.update(this, "id");
+//        student.delete(this,"id");
         List<Object> list = student.getDatas(this, Student.class);
 //        List<Object> list = SmartSQLite.getInstance(this).getDatas(Student.class);
         for (int i = 0; i < list.size(); i++) {
@@ -65,5 +67,9 @@ public class MainActivity extends AppCompatActivity {
             Teacher teach = (Teacher) listTeacher.get(i);
             Log.i("info", "信息：" + teach.getId() + "  " + teach.getName());
         }
+        SmartSQLite.getInstance(this).queryDatas(Student.class, "id", "0");
+        SmartSQLite.getInstance(this).queryBlurryDatas(Student.class, "name", "名字");
+        SmartSQLite.getInstance(this).queryPagingDatas(Student.class, new String[]{"name"}, new String[]{"名字"}, 0, 10);
+        SmartSQLite.getInstance(this).queryBlurryPagingDatas(Student.class, "name", "名字", 0, 10);
     }
 }

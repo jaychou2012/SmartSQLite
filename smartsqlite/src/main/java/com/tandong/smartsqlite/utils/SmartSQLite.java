@@ -286,7 +286,211 @@ public class SmartSQLite {
         SmartSQLite.getInstance(context).updateData(className, key, object, dataEntities);
     }
 
-    public List<Object> getDatas(Context context, Class table) {
+    public List<Object> queryDatas(Class table, String key, String value) {
+        List<Object> list = new ArrayList<Object>();
+        Cursor cursor = sqLiteDatabase.rawQuery("select * from " + table.getSimpleName() + " where "
+                + key + "=?", new String[]{value});
+        DBEntity dbEntity = Utils.getEntity(table);
+        while (cursor.moveToNext()) {
+            Object object = null;
+            try {
+                object = table.newInstance();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            for (int i = 0; i < dbEntity.getEntityColumns().size(); i++) {
+                try {
+                    EntityColumn entityColumn = dbEntity.getEntityColumns().get(i);
+                    Field field = table.getDeclaredField(entityColumn.getName());
+                    field.setAccessible(true);
+                    if (Utils.convertSQLType(entityColumn.getType()).equals("VARCHAR")) {
+                        if (entityColumn.getType().equals("long")) {
+                            field.set(object, cursor.getLong(cursor.getColumnIndex(entityColumn.getName())));
+                        } else if (entityColumn.getType().equals("float")) {
+                            field.set(object, cursor.getFloat(cursor.getColumnIndex(entityColumn.getName())));
+                        } else if (entityColumn.getType().equals("double")) {
+                            field.set(object, cursor.getDouble(cursor.getColumnIndex(entityColumn.getName())));
+                        } else if (entityColumn.getType().equals("boolean")) {
+                            field.set(object, cursor.getString(cursor.getColumnIndex(entityColumn.getName())).equals("1") ? true : false);
+                        } else {
+                            field.set(object, cursor.getString(cursor.getColumnIndex(entityColumn.getName())));
+                        }
+                    } else {
+                        field.set(object, cursor.getInt(cursor.getColumnIndex(entityColumn.getName())));
+                    }
+                } catch (NoSuchFieldException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+            list.add(object);
+        }
+        return list;
+    }
+
+    public List<Object> queryBlurryDatas(Class table, String key, String likeValue) {
+        List<Object> list = new ArrayList<Object>();
+        Cursor cursor = sqLiteDatabase.rawQuery("select * from " + table.getSimpleName() + " where "
+                + key + " like ?", new String[]{"%" + likeValue + "%"});
+        DBEntity dbEntity = Utils.getEntity(table);
+        while (cursor.moveToNext()) {
+            Object object = null;
+            try {
+                object = table.newInstance();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            for (int i = 0; i < dbEntity.getEntityColumns().size(); i++) {
+                try {
+                    EntityColumn entityColumn = dbEntity.getEntityColumns().get(i);
+                    Field field = table.getDeclaredField(entityColumn.getName());
+                    field.setAccessible(true);
+                    if (Utils.convertSQLType(entityColumn.getType()).equals("VARCHAR")) {
+                        if (entityColumn.getType().equals("long")) {
+                            field.set(object, cursor.getLong(cursor.getColumnIndex(entityColumn.getName())));
+                        } else if (entityColumn.getType().equals("float")) {
+                            field.set(object, cursor.getFloat(cursor.getColumnIndex(entityColumn.getName())));
+                        } else if (entityColumn.getType().equals("double")) {
+                            field.set(object, cursor.getDouble(cursor.getColumnIndex(entityColumn.getName())));
+                        } else if (entityColumn.getType().equals("boolean")) {
+                            field.set(object, cursor.getString(cursor.getColumnIndex(entityColumn.getName())).equals("1") ? true : false);
+                        } else {
+                            field.set(object, cursor.getString(cursor.getColumnIndex(entityColumn.getName())));
+                        }
+                    } else {
+                        field.set(object, cursor.getInt(cursor.getColumnIndex(entityColumn.getName())));
+                    }
+                } catch (NoSuchFieldException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+            list.add(object);
+        }
+        return list;
+    }
+
+    public List<Object> queryPagingDatas(Class table, String[] key, String[] value, int pageSize, int pageNumber) {
+        List<Object> list = new ArrayList<Object>();
+        String keys = "";
+        for (int i = 0; i < key.length; i++) {
+            if (i == key.length - 1) {
+                keys = keys + key[i] + "=?";
+            } else {
+                keys = keys + key[i] + "=?,";
+            }
+        }
+        String values = "";
+        for (int i = 0; i < value.length; i++) {
+            if (i == value.length - 1) {
+                values = values + value[i];
+            } else {
+                values = values + value[i] + ",";
+            }
+        }
+        Cursor cursor = sqLiteDatabase.query(table.getSimpleName(), null,
+                keys,
+                new String[]{values}, null,
+                null,
+                null,
+                pageNumber + "," + pageSize);
+        DBEntity dbEntity = Utils.getEntity(table);
+        while (cursor.moveToNext()) {
+            Object object = null;
+            try {
+                object = table.newInstance();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            for (int i = 0; i < dbEntity.getEntityColumns().size(); i++) {
+                try {
+                    EntityColumn entityColumn = dbEntity.getEntityColumns().get(i);
+                    Field field = table.getDeclaredField(entityColumn.getName());
+                    field.setAccessible(true);
+                    if (Utils.convertSQLType(entityColumn.getType()).equals("VARCHAR")) {
+                        if (entityColumn.getType().equals("long")) {
+                            field.set(object, cursor.getLong(cursor.getColumnIndex(entityColumn.getName())));
+                        } else if (entityColumn.getType().equals("float")) {
+                            field.set(object, cursor.getFloat(cursor.getColumnIndex(entityColumn.getName())));
+                        } else if (entityColumn.getType().equals("double")) {
+                            field.set(object, cursor.getDouble(cursor.getColumnIndex(entityColumn.getName())));
+                        } else if (entityColumn.getType().equals("boolean")) {
+                            field.set(object, cursor.getString(cursor.getColumnIndex(entityColumn.getName())).equals("1") ? true : false);
+                        } else {
+                            field.set(object, cursor.getString(cursor.getColumnIndex(entityColumn.getName())));
+                        }
+                    } else {
+                        field.set(object, cursor.getInt(cursor.getColumnIndex(entityColumn.getName())));
+                    }
+                } catch (NoSuchFieldException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+            list.add(object);
+        }
+        return list;
+    }
+
+    public List<Object> queryBlurryPagingDatas(Class table, String key, String likeValue, int pageSize, int pageNumber) {
+        List<Object> list = new ArrayList<Object>();
+        Cursor cursor = sqLiteDatabase.query(table.getSimpleName(), null,
+                key + " like ?",
+                new String[]{"%" + likeValue + "%"}, null,
+                null,
+                null,
+                pageNumber + "," + pageSize);
+        DBEntity dbEntity = Utils.getEntity(table);
+        while (cursor.moveToNext()) {
+            Object object = null;
+            try {
+                object = table.newInstance();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            for (int i = 0; i < dbEntity.getEntityColumns().size(); i++) {
+                try {
+                    EntityColumn entityColumn = dbEntity.getEntityColumns().get(i);
+                    Field field = table.getDeclaredField(entityColumn.getName());
+                    field.setAccessible(true);
+                    if (Utils.convertSQLType(entityColumn.getType()).equals("VARCHAR")) {
+                        if (entityColumn.getType().equals("long")) {
+                            field.set(object, cursor.getLong(cursor.getColumnIndex(entityColumn.getName())));
+                        } else if (entityColumn.getType().equals("float")) {
+                            field.set(object, cursor.getFloat(cursor.getColumnIndex(entityColumn.getName())));
+                        } else if (entityColumn.getType().equals("double")) {
+                            field.set(object, cursor.getDouble(cursor.getColumnIndex(entityColumn.getName())));
+                        } else if (entityColumn.getType().equals("boolean")) {
+                            field.set(object, cursor.getString(cursor.getColumnIndex(entityColumn.getName())).equals("1") ? true : false);
+                        } else {
+                            field.set(object, cursor.getString(cursor.getColumnIndex(entityColumn.getName())));
+                        }
+                    } else {
+                        field.set(object, cursor.getInt(cursor.getColumnIndex(entityColumn.getName())));
+                    }
+                } catch (NoSuchFieldException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+            list.add(object);
+        }
+        return list;
+    }
+
+    public List<Object> getEntityDatas(Context context, Class table) {
         return SmartSQLite.getInstance(context).getDatas(table);
     }
 
@@ -311,6 +515,8 @@ public class SmartSQLite {
     }
 
     public void closeDB() {
-        sqLiteDatabase.close();
+        if (sqLiteDatabase != null) {
+            sqLiteDatabase.close();
+        }
     }
 }

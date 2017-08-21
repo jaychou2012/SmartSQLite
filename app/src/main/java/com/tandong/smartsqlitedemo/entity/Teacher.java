@@ -67,6 +67,6 @@ public class Teacher implements TableEntity {
 
     @Override
     public List<Object> getDatas(Context context, Class table) {
-        return SmartSQLite.getInstance(context).getDatas(context, table);
+        return SmartSQLite.getInstance(context).getEntityDatas(context, table);
     }
 }
