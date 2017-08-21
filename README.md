@@ -15,6 +15,8 @@ SmartSQLite是一款强大的ORM数据库（对象关系映射，英语：Object
 *   单例模式，无需再自己关闭打开数据库，无需担心内存泄漏了
 *   自动检测识别类型，支持int,string,boolean,float,double,long类型，其它类型后续将会扩展
 *   查询数据自动构建成对象，无需编写复杂的逻辑
+*   无需使用SQL语句
+*   支持模糊查询和分页查询等
 
 # 2.SmartSQLite基本用法
 
