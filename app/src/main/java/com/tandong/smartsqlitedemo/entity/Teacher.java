@@ -30,7 +30,7 @@ import java.util.List;
  * @date 2017-8-20
  */
 
-public class Teacher implements TableEntity {
+public class Teacher implements TableEntity<Teacher> {
     private int id;
     private String name;
 
@@ -66,7 +66,7 @@ public class Teacher implements TableEntity {
     }
 
     @Override
-    public List<Object> getDatas(Context context, Class table) {
+    public List<Teacher> getDatas(Context context, Class<Teacher> table) {
         return SmartSQLite.getInstance(context).getEntityDatas(context, table);
     }
 }

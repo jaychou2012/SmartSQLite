@@ -26,12 +26,12 @@ import java.util.List;
  * @date 2017-8-20
  */
 
-public interface TableEntity {
+public interface TableEntity<T> {
     void save(Context context);
 
     void delete(Context context, String key);
 
     void update(Context context, String key);
 
-    List<Object> getDatas(Context context, Class table);
+    List<T> getDatas(Context context, Class<T> table);
 }

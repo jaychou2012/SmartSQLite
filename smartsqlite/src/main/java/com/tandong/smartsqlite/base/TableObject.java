@@ -31,7 +31,7 @@ import java.util.List;
  * @author Tandong
  * @date 2017-8-20
  */
-public class TableObject {
+public class TableObject <T>{
     private ArrayList<DataEntity> dataEntities;
 
     public void save(Context context) {
@@ -104,7 +104,7 @@ public class TableObject {
         SmartSQLite.getInstance(context).updateData(className, key, object, dataEntities);
     }
 
-    public List<Object> getDatas(Context context, Class table) {
+    public List<T> getDatas(Context context, Class<T> table) {
         return SmartSQLite.getInstance(context).getDatas(table);
     }
 

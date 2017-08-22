@@ -39,7 +39,7 @@ import static android.content.Context.MODE_PRIVATE;
  * @date 2017-8-20
  */
 
-public class SmartSQLite {
+public class SmartSQLite<T> {
     private static SmartSQLite dbManager;
     private SmartHelper smartHelper;
     private SQLiteDatabase sqLiteDatabase;
@@ -173,12 +173,12 @@ public class SmartSQLite {
         }
     }
 
-    public List<Object> getDatas(Class table) {
-        List<Object> list = new ArrayList<Object>();
+    public List<T> getDatas(Class<T> table) {
+        List<T> list = new ArrayList<T>();
         Cursor cursor = sqLiteDatabase.rawQuery("select * from " + table.getSimpleName(), null);
         DBEntity dbEntity = Utils.getEntity(table);
         while (cursor.moveToNext()) {
-            Object object = null;
+            T object = null;
             try {
                 object = table.newInstance();
             } catch (InstantiationException e) {

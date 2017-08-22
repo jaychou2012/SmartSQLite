@@ -52,19 +52,19 @@ public class MainActivity extends AppCompatActivity {
         student.save(this);
 //        student.update(this, "id");
 //        student.delete(this,"id");
-        List<Object> list = student.getDatas(this, Student.class);
-//        List<Object> list = SmartSQLite.getInstance(this).getDatas(Student.class);
+        List<Student> list = student.getDatas(this, Student.class);
+//        List<Student> list = SmartSQLite.getInstance(this).getDatas(Student.class);
         for (int i = 0; i < list.size(); i++) {
-            Student stu = (Student) list.get(i);
+            Student stu = list.get(i);
             Log.i("info", "信息：" + stu.getId() + "  " + stu.getName() + "  " + stu.isHigh() + "  " + stu.getTimeDouble() + "  " + stu.getTimeFloat() + "  " + stu.getTimeLong());
         }
         Teacher teacher = new Teacher();
         teacher.setId(0);
         teacher.setName("教师");
         teacher.save(this);
-        List<Object> listTeacher = student.getDatas(this, Teacher.class);
+        List<Teacher> listTeacher = teacher.getDatas(this, Teacher.class);
         for (int i = 0; i < listTeacher.size(); i++) {
-            Teacher teach = (Teacher) listTeacher.get(i);
+            Teacher teach = listTeacher.get(i);
             Log.i("info", "信息：" + teach.getId() + "  " + teach.getName());
         }
         SmartSQLite.getInstance(this).queryDatas(Student.class, "id", "0");
