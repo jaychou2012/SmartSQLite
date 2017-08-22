@@ -107,7 +107,7 @@ allprojects {
         SmartConfig.DB_NAME = "smartsqlite.db";//必填
         SmartConfig.DB_VERSION = 1;//选填，推荐写
         SmartConfig.ENTITY_PACKAGE = "entity";//默认为entity
-        List<String> classNameList = new ArrayList<>();//数据库表集合，也就是实体类名称集合
+        List<String> classNameList = new ArrayList<String>();//数据库表集合，也就是实体类名称集合
         classNameList.add("Student");
         classNameList.add("Teacher");
         SmartConfig.classes = classNameList;//赋值
