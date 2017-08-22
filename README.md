@@ -15,6 +15,8 @@ SmartSQLite是一款强大的ORM数据库（对象关系映射，英语：Object
 *   单例模式，无需再自己关闭打开数据库，无需担心内存泄漏了
 *   自动检测识别类型，支持int,string,boolean,float,double,long类型，其它类型后续将会扩展
 *   查询数据自动构建成对象，无需编写复杂的逻辑
+*   无需使用SQL语句
+*   支持模糊查询和分页查询等
 
 # 2.SmartSQLite基本用法
 
@@ -29,7 +31,7 @@ allprojects {
 </pre></code>
 
 <pre><code>
-    compile 'com.github.jaychou2012:SmartSQLite:1.0.0.1'
+    compile 'com.github.jaychou2012:SmartSQLite:1.0.0.2'
 </pre></code>
 
 1.创建实体类，例如在entity文件夹新建一个Student类，只需继承TableObject，如果实体无法继承，请看Demo的第二种方案，实现接口TableEntity即可：
