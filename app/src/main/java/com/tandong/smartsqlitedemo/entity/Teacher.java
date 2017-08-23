@@ -18,6 +18,7 @@ package com.tandong.smartsqlitedemo.entity;
 import android.content.Context;
 
 import com.tandong.smartsqlite.base.TableEntity;
+import com.tandong.smartsqlite.key.TableNameInDB;
 import com.tandong.smartsqlite.utils.SmartSQLite;
 
 import java.util.List;
@@ -29,7 +30,7 @@ import java.util.List;
  * @author Tandong
  * @date 2017-8-20
  */
-
+@TableNameInDB("TheTeacher")
 public class Teacher implements TableEntity<Teacher> {
     private int id;
     private String name;

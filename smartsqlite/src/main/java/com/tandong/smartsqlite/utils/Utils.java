@@ -20,7 +20,9 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.tandong.smartsqlite.base.DBEntity;
 import com.tandong.smartsqlite.base.EntityColumn;
+import com.tandong.smartsqlite.key.TableNameInDB;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -43,7 +45,14 @@ public class Utils {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        String sql = classEntity.getSimpleName() + ":";
+        String sql = "";
+        boolean name = classEntity.isAnnotationPresent(TableNameInDB.class);
+        if (name) {
+            Annotation[] annotationses = classEntity.getAnnotations();
+            sql = ((TableNameInDB) annotationses[0]).value() + ":";
+        } else {
+            sql = classEntity.getSimpleName() + ":";
+        }
         Field[] fields = classEntity.getDeclaredFields();
         AccessibleObject.setAccessible(fields, true);
         for (int i = 0; i < fields.length; i++) {

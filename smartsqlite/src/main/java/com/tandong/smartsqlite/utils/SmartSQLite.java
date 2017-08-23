@@ -24,7 +24,9 @@ import android.database.sqlite.SQLiteDatabase;
 import com.tandong.smartsqlite.base.DBEntity;
 import com.tandong.smartsqlite.base.DataEntity;
 import com.tandong.smartsqlite.base.EntityColumn;
+import com.tandong.smartsqlite.key.TableNameInDB;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -222,6 +224,11 @@ public class SmartSQLite<T> {
         AccessibleObject.setAccessible(fields, true);
         String className = object.getClass().getSimpleName();
         List<DataEntity> dataEntities = new ArrayList<DataEntity>();
+        boolean tableName = object.getClass().isAnnotationPresent(TableNameInDB.class);
+        if (tableName) {
+            Annotation[] annotationses = object.getClass().getAnnotations();
+            className = ((TableNameInDB) annotationses[0]).value();
+        }
         for (Field field :
                 fields) {
             try {
