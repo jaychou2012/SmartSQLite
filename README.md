@@ -18,7 +18,14 @@ SmartSQLite是一款强大的ORM数据库（对象关系映射，英语：Object
 *   无需使用SQL语句
 *   支持模糊查询和分页查询等
 
-# 2.SmartSQLite基本用法
+# 2.即将支持
+
+*   自定义存储在数据库中的表名
+*   自定义指定不存储在数据库中的属性名
+*   自定义指定排序字段
+*   老版本数据库迁移
+
+# 3.SmartSQLite基本用法
 
 引用库：
 <pre><code>
@@ -31,7 +38,7 @@ allprojects {
 </pre></code>
 
 <pre><code>
-    compile 'com.github.jaychou2012:SmartSQLite:1.0.0.2'
+    compile 'com.github.jaychou2012:SmartSQLite:1.0.0.3'
 </pre></code>
 
 1.创建实体类，例如在entity文件夹新建一个Student类，只需继承TableObject，如果实体无法继承，请看Demo的第二种方案，实现接口TableEntity即可：
@@ -107,7 +114,7 @@ allprojects {
         SmartConfig.DB_NAME = "smartsqlite.db";//必填
         SmartConfig.DB_VERSION = 1;//选填，推荐写
         SmartConfig.ENTITY_PACKAGE = "entity";//默认为entity
-        List<String> classNameList = new ArrayList<>();//数据库表集合，也就是实体类名称集合
+        List<String> classNameList = new ArrayList<String>();//数据库表集合，也就是实体类名称集合
         classNameList.add("Student");
         classNameList.add("Teacher");
         SmartConfig.classes = classNameList;//赋值
@@ -127,21 +134,25 @@ allprojects {
         student.save(this);
 //        student.update(this, "id");
 //        student.delete(this,"id");
-        List<Object> list = student.getDatas(this, Student.class);
-//        List<Object> list = SmartSQLite.getInstance(this).getDatas(Student.class);
+        List<Student> list = student.getDatas(this, Student.class);
+//        List<Student> list = SmartSQLite.getInstance(this).getDatas(Student.class);
         for (int i = 0; i < list.size(); i++) {
-            Student stu = (Student) list.get(i);
+            Student stu = list.get(i);
             Log.i("info", "信息：" + stu.getId() + "  " + stu.getName() + "  " + stu.isHigh() + "  " + stu.getTimeDouble() + "  " + stu.getTimeFloat() + "  " + stu.getTimeLong());
         }
         Teacher teacher = new Teacher();
         teacher.setId(0);
         teacher.setName("教师");
         teacher.save(this);
-        List<Object> listTeacher = student.getDatas(this, Teacher.class);
+        List<Teacher> listTeacher = teacher.getDatas(this, Teacher.class);
         for (int i = 0; i < listTeacher.size(); i++) {
-            Teacher teach = (Teacher) listTeacher.get(i);
+            Teacher teach = listTeacher.get(i);
             Log.i("info", "信息：" + teach.getId() + "  " + teach.getName());
         }
+        SmartSQLite.getInstance(this).queryDatas(Student.class, "id", "0");
+        SmartSQLite.getInstance(this).queryBlurryDatas(Student.class, "name", "名字");
+        SmartSQLite.getInstance(this).queryPagingDatas(Student.class, new String[]{"name"}, new String[]{"名字"}, 0, 10);
+        SmartSQLite.getInstance(this).queryBlurryPagingDatas(Student.class, "name", "名字", 0, 10);
     }
 </code></pre>
 
