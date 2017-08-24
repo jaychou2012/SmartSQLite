@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.tandong.smartsqlite.base.DBEntity;
 import com.tandong.smartsqlite.base.DataEntity;
@@ -152,7 +153,7 @@ public class SmartSQLite<T> {
     }
 
     public void delData(String className, String key, String object) {
-        sqLiteDatabase.delete(className, key, new String[]{object});
+        sqLiteDatabase.delete(className, key + "=?", new String[]{object});
     }
 
     public void updateData(String className, String key, String object, List<DataEntity> dataEntity) {
@@ -177,7 +178,13 @@ public class SmartSQLite<T> {
 
     public List<T> getDatas(Class<T> table) {
         List<T> list = new ArrayList<T>();
-        Cursor cursor = sqLiteDatabase.rawQuery("select * from " + table.getSimpleName(), null);
+        String name = table.getSimpleName();
+        boolean tableName = table.isAnnotationPresent(TableNameInDB.class);
+        if (tableName) {
+            Annotation[] annotationses = table.getAnnotations();
+            name = ((TableNameInDB) annotationses[0]).value();
+        }
+        Cursor cursor = sqLiteDatabase.rawQuery("select * from " + name, null);
         DBEntity dbEntity = Utils.getEntity(table);
         while (cursor.moveToNext()) {
             T object = null;
@@ -249,6 +256,11 @@ public class SmartSQLite<T> {
         Field[] fields = obj.getClass().getDeclaredFields();
         AccessibleObject.setAccessible(fields, true);
         String className = obj.getClass().getSimpleName();
+        boolean tableName = obj.getClass().isAnnotationPresent(TableNameInDB.class);
+        if (tableName) {
+            Annotation[] annotationses = obj.getClass().getAnnotations();
+            className = ((TableNameInDB) annotationses[0]).value();
+        }
         String object = null;
         for (Field field :
                 fields) {
@@ -268,6 +280,11 @@ public class SmartSQLite<T> {
         AccessibleObject.setAccessible(fields, true);
         List<DataEntity> dataEntities = new ArrayList<DataEntity>();
         String className = obj.getClass().getSimpleName();
+        boolean tableName = obj.getClass().isAnnotationPresent(TableNameInDB.class);
+        if (tableName) {
+            Annotation[] annotationses = obj.getClass().getAnnotations();
+            className = ((TableNameInDB) annotationses[0]).value();
+        }
         String object = null;
         for (Field field :
                 fields) {
@@ -295,7 +312,13 @@ public class SmartSQLite<T> {
 
     public List<Object> queryDatas(Class table, String key, String value) {
         List<Object> list = new ArrayList<Object>();
-        Cursor cursor = sqLiteDatabase.rawQuery("select * from " + table.getSimpleName() + " where "
+        String name = table.getSimpleName();
+        boolean tableName = table.isAnnotationPresent(TableNameInDB.class);
+        if (tableName) {
+            Annotation[] annotationses = table.getClass().getAnnotations();
+            name = ((TableNameInDB) annotationses[0]).value();
+        }
+        Cursor cursor = sqLiteDatabase.rawQuery("select * from " + name + " where "
                 + key + "=?", new String[]{value});
         DBEntity dbEntity = Utils.getEntity(table);
         while (cursor.moveToNext()) {
@@ -340,7 +363,13 @@ public class SmartSQLite<T> {
 
     public List<Object> queryBlurryDatas(Class table, String key, String likeValue) {
         List<Object> list = new ArrayList<Object>();
-        Cursor cursor = sqLiteDatabase.rawQuery("select * from " + table.getSimpleName() + " where "
+        String name = table.getSimpleName();
+        boolean tableName = table.isAnnotationPresent(TableNameInDB.class);
+        if (tableName) {
+            Annotation[] annotationses = table.getClass().getAnnotations();
+            name = ((TableNameInDB) annotationses[0]).value();
+        }
+        Cursor cursor = sqLiteDatabase.rawQuery("select * from " + name + " where "
                 + key + " like ?", new String[]{"%" + likeValue + "%"});
         DBEntity dbEntity = Utils.getEntity(table);
         while (cursor.moveToNext()) {
@@ -383,7 +412,7 @@ public class SmartSQLite<T> {
         return list;
     }
 
-    public List<Object> queryPagingDatas(Class table, String[] key, String[] value, int pageSize, int pageNumber) {
+    public List<Object> queryPagingDatas(Class table, String[] key, String[] value, int pageNumber, int pageSize) {
         List<Object> list = new ArrayList<Object>();
         String keys = "";
         for (int i = 0; i < key.length; i++) {
@@ -401,7 +430,13 @@ public class SmartSQLite<T> {
                 values = values + value[i] + ",";
             }
         }
-        Cursor cursor = sqLiteDatabase.query(table.getSimpleName(), null,
+        String name = table.getSimpleName();
+        boolean tableName = table.isAnnotationPresent(TableNameInDB.class);
+        if (tableName) {
+            Annotation[] annotationses = table.getClass().getAnnotations();
+            name = ((TableNameInDB) annotationses[0]).value();
+        }
+        Cursor cursor = sqLiteDatabase.query(name, null,
                 keys,
                 new String[]{values}, null,
                 null,
@@ -448,17 +483,23 @@ public class SmartSQLite<T> {
         return list;
     }
 
-    public List<Object> queryBlurryPagingDatas(Class table, String key, String likeValue, int pageSize, int pageNumber) {
-        List<Object> list = new ArrayList<Object>();
-        Cursor cursor = sqLiteDatabase.query(table.getSimpleName(), null,
+    public List<T> queryBlurryPagingDatas(Class<T> table, String key, String likeValue, int pageNumber, int pageSize) {
+        List<T> list = new ArrayList<T>();
+        String name = table.getSimpleName();
+        boolean tableName = table.isAnnotationPresent(TableNameInDB.class);
+        if (tableName) {
+            Annotation[] annotationses = table.getAnnotations();
+            name = ((TableNameInDB) annotationses[0]).value();
+        }
+        Cursor cursor = sqLiteDatabase.query(name, null,
                 key + " like ?",
                 new String[]{"%" + likeValue + "%"}, null,
                 null,
                 null,
-                pageNumber + "," + pageSize);
+                pageNumber * pageSize + "," + pageSize);
         DBEntity dbEntity = Utils.getEntity(table);
         while (cursor.moveToNext()) {
-            Object object = null;
+            T object = null;
             try {
                 object = table.newInstance();
             } catch (InstantiationException e) {
@@ -518,7 +559,11 @@ public class SmartSQLite<T> {
     }
 
     public boolean isDbOpen() {
-        return sqLiteDatabase.isOpen();
+        if (sqLiteDatabase != null) {
+            return sqLiteDatabase.isOpen();
+        } else {
+            return false;
+        }
     }
 
     public void closeDB() {

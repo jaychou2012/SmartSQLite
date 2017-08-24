@@ -17,9 +17,11 @@ package com.tandong.smartsqlite.base;
 
 import android.content.Context;
 
+import com.tandong.smartsqlite.key.TableNameInDB;
 import com.tandong.smartsqlite.utils.SmartLog;
 import com.tandong.smartsqlite.utils.SmartSQLite;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -31,13 +33,18 @@ import java.util.List;
  * @author Tandong
  * @date 2017-8-20
  */
-public class TableObject <T>{
+public class TableObject<T> {
     private ArrayList<DataEntity> dataEntities;
 
     public void save(Context context) {
         Field[] fields = getClass().getDeclaredFields();
         AccessibleObject.setAccessible(fields, true);
         String className = getName();
+        boolean tableName = getClass().isAnnotationPresent(TableNameInDB.class);
+        if (tableName) {
+            Annotation[] annotationses = getClass().getAnnotations();
+            className = ((TableNameInDB) annotationses[0]).value();
+        }
         dataEntities = new ArrayList<DataEntity>();
         for (Field field :
                 fields) {
@@ -60,6 +67,11 @@ public class TableObject <T>{
         Field[] fields = getClass().getDeclaredFields();
         AccessibleObject.setAccessible(fields, true);
         String className = getName();
+        boolean tableName = getClass().isAnnotationPresent(TableNameInDB.class);
+        if (tableName) {
+            Annotation[] annotationses = getClass().getAnnotations();
+            className = ((TableNameInDB) annotationses[0]).value();
+        }
         String object = null;
         for (Field field :
                 fields) {
@@ -79,6 +91,11 @@ public class TableObject <T>{
         AccessibleObject.setAccessible(fields, true);
         dataEntities = new ArrayList<DataEntity>();
         String className = getName();
+        boolean tableName = getClass().isAnnotationPresent(TableNameInDB.class);
+        if (tableName) {
+            Annotation[] annotationses = getClass().getAnnotations();
+            className = ((TableNameInDB) annotationses[0]).value();
+        }
         String object = null;
         for (Field field :
                 fields) {

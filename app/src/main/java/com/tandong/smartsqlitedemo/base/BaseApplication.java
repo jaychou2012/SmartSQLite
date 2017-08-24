@@ -48,4 +48,10 @@ public class BaseApplication extends Application {
         SmartConfig.classes = classNameList;//赋值
         SmartSQLite.initSmartSQLite(this);//自动初始化，全自动升级数据库，检测创建表，增加字段，删除表等
     }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        SmartSQLite.getInstance(this).closeDB();
+    }
 }
