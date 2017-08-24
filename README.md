@@ -27,9 +27,10 @@ SmartSQLite是一款强大的ORM数据库（对象关系映射，英语：Object
 
 # 2.框架对比
 
-|     A       | GreenDao        | OrmLite      | ActiveAndroid  | RealIm  | SmartSQLite  | 原生SQLite |
-| ----------- |: -------------:|:-------------:|: -----:|: -----:| :-----:| -----:|
-| 库大小       | col 3 is      | right-aligned | A | A | A | A |
+| 左对齐标题 | 右对齐标题 | 居中对齐标题 |
+| :------| ------: | :------: |
+| 短文本 | 中等文本 | 稍微长一点的文本 |
+| 稍微长一点的文本 | 短文本 | 中等文本 |
 
 # 3.SmartSQLite基本用法
 
