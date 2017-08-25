@@ -27,10 +27,11 @@ import java.util.List;
 public class SmartConfig {
     public static List<String> classes = null;//数据库表集合
     public static String sqlStructure = "";
-    public static String sp_key="smartsqlite";
+    public static String sp_key = "smartsqlite";
     public static String DB_NAME = "";//你数据库文件名，必填
     public static String ENTITY_PACKAGE = "entity";//你的实体类所在包的文件夹名，默认entity文件夹，根据项目实际位置和名称修改设置
     public static int DB_VERSION = 1;//可设置，可不设置，因为SmartSQLite支持全自动升级、删除表、新增字段（不支持修改字段，删除字段，因为SQLite暂不支持，如想修改或删除字段，请重新删除创建表）
     public static String DB_PATH = "";//数据库文件存储路径
+    public static boolean ENCRYPT = false;//是否加密数据库
     public static boolean LOG = false;
 }

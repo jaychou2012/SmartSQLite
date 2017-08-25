@@ -76,4 +76,9 @@ public class MainActivity extends AppCompatActivity {
             Log.i("info", "信息分页：" + teach.getId() + "  " + teach.getName());
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }

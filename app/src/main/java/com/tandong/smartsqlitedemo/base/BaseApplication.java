@@ -16,6 +16,7 @@
 package com.tandong.smartsqlitedemo.base;
 
 import android.app.Application;
+import android.os.Environment;
 
 import com.tandong.smartsqlite.utils.SmartConfig;
 import com.tandong.smartsqlite.utils.SmartSQLite;
@@ -42,7 +43,7 @@ public class BaseApplication extends Application {
         SmartConfig.DB_NAME = "smartsqlite.db";//必填
         SmartConfig.DB_VERSION = 1;//选填，推荐写
         SmartConfig.ENTITY_PACKAGE = "entity";//默认为entity
-        //SmartConfig.DB_PATH = Environment.getExternalStorageDirectory() + "/";//自定义数据库存储路径,反斜杠结尾
+        SmartConfig.DB_PATH = Environment.getExternalStorageDirectory() + "/";//自定义数据库存储路径,反斜杠结尾
         List<String> classNameList = new ArrayList<>();//数据库表集合，也就是实体类名称集合
         classNameList.add("Student");
         classNameList.add("Teacher");
