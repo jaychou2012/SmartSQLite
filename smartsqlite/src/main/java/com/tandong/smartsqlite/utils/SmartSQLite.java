@@ -20,7 +20,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.tandong.smartsqlite.base.DBEntity;
 import com.tandong.smartsqlite.base.DataEntity;
@@ -58,7 +57,11 @@ public class SmartSQLite<T> {
     public SmartSQLite(Context context) {
         this.context = context;
         smartHelper = new SmartHelper(context);
-        sqLiteDatabase = smartHelper.getWritableDatabase();
+        if (SmartConfig.DB_PATH.equals("")) {
+            sqLiteDatabase = smartHelper.getWritableDatabase();
+        } else {
+            sqLiteDatabase = SQLiteDatabase.openOrCreateDatabase(SmartConfig.DB_PATH + SmartConfig.DB_NAME, null);
+        }
     }
 
     public void createTables(ArrayList<DBEntity> list) {
@@ -543,7 +546,7 @@ public class SmartSQLite<T> {
     }
 
     public static void initSmartSQLite(Context context) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences("smartsqlite", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = context.getSharedPreferences(SmartConfig.sp_key, MODE_PRIVATE);
         String sqlStructure = "";
         for (int i = 0; i < SmartConfig.classes.size(); i++) {
             String sql = Utils.getSQL(context.getPackageName() + "." + SmartConfig.ENTITY_PACKAGE + "." + SmartConfig.classes.get(i));
@@ -554,8 +557,8 @@ public class SmartSQLite<T> {
             }
         }
         SmartConfig.sqlStructure = sqlStructure;
-        Utils.mapSQL(context, sharedPreferences.getString("smartsqlite", ""));
-        sharedPreferences.edit().putString("smartsqlite", sqlStructure).commit();
+        Utils.mapSQL(context, sharedPreferences.getString(SmartConfig.sp_key, ""));
+        sharedPreferences.edit().putString(SmartConfig.sp_key, sqlStructure).commit();
     }
 
     public boolean isDbOpen() {
