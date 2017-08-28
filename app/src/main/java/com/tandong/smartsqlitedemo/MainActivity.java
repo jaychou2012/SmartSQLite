@@ -68,13 +68,15 @@ public class MainActivity extends AppCompatActivity {
             Log.i("info", "信息：" + teach.getId() + "  " + teach.getName());
         }
         List<Student> listStu = SmartSQLite.getInstance(this).queryDatas(Student.class, "id", "0");
-        SmartSQLite.getInstance(this).queryBlurryDatas(Student.class, "name", "名字");
-        SmartSQLite.getInstance(this).queryPagingDatas(Student.class, new String[]{"name"}, new String[]{"名字"}, 0, 10);
-        List<Teacher> listTea = SmartSQLite.getInstance(this).queryBlurryPagingDatas(Teacher.class, "name", "教师", 0, 10);
+        List<Student> listStuOrder = SmartSQLite.getInstance(this).queryDatas(Student.class, "id", "0","id desc");//排序
+        SmartSQLite.getInstance(this).queryBlurryDatas(Student.class, "name", "名字");//模糊查询
+        SmartSQLite.getInstance(this).queryPagingDatas(Student.class, new String[]{"name"}, new String[]{"名字"}, 0, 10);//分页查询
+        List<Teacher> listTea = SmartSQLite.getInstance(this).queryBlurryPagingDatas(Teacher.class, "name", "教师", 0, 10,"id desc");//模糊分页查询,排序
         for (int i = 0; i < listTea.size(); i++) {
             Teacher teach = listTea.get(i);
             Log.i("info", "信息分页：" + teach.getId() + "  " + teach.getName());
         }
+//        SmartSQLite.getInstance(this).executeSQL("");//执行sql语句
     }
 
     @Override

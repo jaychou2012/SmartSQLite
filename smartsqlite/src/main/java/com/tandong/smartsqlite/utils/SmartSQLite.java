@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.tandong.smartsqlite.base.DBEntity;
 import com.tandong.smartsqlite.base.DataEntity;
@@ -73,9 +74,17 @@ public class SmartSQLite<T> {
                 String tables = "";
                 for (int j = 0; j < list.get(i).getEntityColumns().size(); j++) {
                     if (j == list.get(i).getEntityColumns().size() - 1) {
-                        tables = tables + list.get(i).getEntityColumns().get(j).getName() + " " + Utils.convertSQLType(list.get(i).getEntityColumns().get(j).getType());
+                        if (list.get(i).getEntityColumns().get(j).getName().equals("key_id")) {
+                            tables = tables + list.get(i).getEntityColumns().get(j).getName() + " " + Utils.convertSQLType(list.get(i).getEntityColumns().get(j).getType()) + " PRIMARY KEY AUTOINCREMENT";
+                        } else {
+                            tables = tables + list.get(i).getEntityColumns().get(j).getName() + " " + Utils.convertSQLType(list.get(i).getEntityColumns().get(j).getType());
+                        }
                     } else {
-                        tables = tables + list.get(i).getEntityColumns().get(j).getName() + " " + Utils.convertSQLType(list.get(i).getEntityColumns().get(j).getType()) + ",";
+                        if (list.get(i).getEntityColumns().get(j).getName().equals("key_id")) {
+                            tables = tables + list.get(i).getEntityColumns().get(j).getName() + " " + Utils.convertSQLType(list.get(i).getEntityColumns().get(j).getType()) + " PRIMARY KEY AUTOINCREMENT,";
+                        } else {
+                            tables = tables + list.get(i).getEntityColumns().get(j).getName() + " " + Utils.convertSQLType(list.get(i).getEntityColumns().get(j).getType()) + ",";
+                        }
                     }
                 }
                 SmartLog.i("info", "SQL:" + sql.replace("tables", tables));
@@ -242,7 +251,7 @@ public class SmartSQLite<T> {
         for (Field field :
                 fields) {
             try {
-                if (!field.getName().equals("$change") && !field.getName().equals("serialVersionUID")) {
+                if (!field.getName().equals("$change") && !field.getName().equals("serialVersionUID") && !field.getName().equals("key_id")) {
                     DataEntity dataEntity = new DataEntity();
                     dataEntity.setName(field.getName());
                     dataEntity.setObject(field.get(object));
@@ -364,6 +373,57 @@ public class SmartSQLite<T> {
         return list;
     }
 
+    public List<Object> queryDatas(Class table, String key, String value,String orderBy) {
+        List<Object> list = new ArrayList<Object>();
+        String name = table.getSimpleName();
+        boolean tableName = table.isAnnotationPresent(TableNameInDB.class);
+        if (tableName) {
+            Annotation[] annotationses = table.getClass().getAnnotations();
+            name = ((TableNameInDB) annotationses[0]).value();
+        }
+        Cursor cursor = sqLiteDatabase.rawQuery("select * from " + name + " where "
+                + key + "=? order by ?", new String[]{value,orderBy});
+        DBEntity dbEntity = Utils.getEntity(table);
+        while (cursor.moveToNext()) {
+            Object object = null;
+            try {
+                object = table.newInstance();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            for (int i = 0; i < dbEntity.getEntityColumns().size(); i++) {
+                try {
+                    EntityColumn entityColumn = dbEntity.getEntityColumns().get(i);
+                    Field field = table.getDeclaredField(entityColumn.getName());
+                    field.setAccessible(true);
+                    if (Utils.convertSQLType(entityColumn.getType()).equals("VARCHAR")) {
+                        if (entityColumn.getType().equals("long")) {
+                            field.set(object, cursor.getLong(cursor.getColumnIndex(entityColumn.getName())));
+                        } else if (entityColumn.getType().equals("float")) {
+                            field.set(object, cursor.getFloat(cursor.getColumnIndex(entityColumn.getName())));
+                        } else if (entityColumn.getType().equals("double")) {
+                            field.set(object, cursor.getDouble(cursor.getColumnIndex(entityColumn.getName())));
+                        } else if (entityColumn.getType().equals("boolean")) {
+                            field.set(object, cursor.getString(cursor.getColumnIndex(entityColumn.getName())).equals("1") ? true : false);
+                        } else {
+                            field.set(object, cursor.getString(cursor.getColumnIndex(entityColumn.getName())));
+                        }
+                    } else {
+                        field.set(object, cursor.getInt(cursor.getColumnIndex(entityColumn.getName())));
+                    }
+                } catch (NoSuchFieldException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+            list.add(object);
+        }
+        return list;
+    }
+
     public List<Object> queryBlurryDatas(Class table, String key, String likeValue) {
         List<Object> list = new ArrayList<Object>();
         String name = table.getSimpleName();
@@ -374,6 +434,57 @@ public class SmartSQLite<T> {
         }
         Cursor cursor = sqLiteDatabase.rawQuery("select * from " + name + " where "
                 + key + " like ?", new String[]{"%" + likeValue + "%"});
+        DBEntity dbEntity = Utils.getEntity(table);
+        while (cursor.moveToNext()) {
+            Object object = null;
+            try {
+                object = table.newInstance();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            for (int i = 0; i < dbEntity.getEntityColumns().size(); i++) {
+                try {
+                    EntityColumn entityColumn = dbEntity.getEntityColumns().get(i);
+                    Field field = table.getDeclaredField(entityColumn.getName());
+                    field.setAccessible(true);
+                    if (Utils.convertSQLType(entityColumn.getType()).equals("VARCHAR")) {
+                        if (entityColumn.getType().equals("long")) {
+                            field.set(object, cursor.getLong(cursor.getColumnIndex(entityColumn.getName())));
+                        } else if (entityColumn.getType().equals("float")) {
+                            field.set(object, cursor.getFloat(cursor.getColumnIndex(entityColumn.getName())));
+                        } else if (entityColumn.getType().equals("double")) {
+                            field.set(object, cursor.getDouble(cursor.getColumnIndex(entityColumn.getName())));
+                        } else if (entityColumn.getType().equals("boolean")) {
+                            field.set(object, cursor.getString(cursor.getColumnIndex(entityColumn.getName())).equals("1") ? true : false);
+                        } else {
+                            field.set(object, cursor.getString(cursor.getColumnIndex(entityColumn.getName())));
+                        }
+                    } else {
+                        field.set(object, cursor.getInt(cursor.getColumnIndex(entityColumn.getName())));
+                    }
+                } catch (NoSuchFieldException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+            list.add(object);
+        }
+        return list;
+    }
+
+    public List<Object> queryBlurryDatas(Class table, String key, String likeValue, String orderBy) {
+        List<Object> list = new ArrayList<Object>();
+        String name = table.getSimpleName();
+        boolean tableName = table.isAnnotationPresent(TableNameInDB.class);
+        if (tableName) {
+            Annotation[] annotationses = table.getClass().getAnnotations();
+            name = ((TableNameInDB) annotationses[0]).value();
+        }
+        Cursor cursor = sqLiteDatabase.rawQuery("select * from " + name + " where "
+                + key + " like ? order by ?", new String[]{"%" + likeValue + "%", orderBy});
         DBEntity dbEntity = Utils.getEntity(table);
         while (cursor.moveToNext()) {
             Object object = null;
@@ -486,6 +597,77 @@ public class SmartSQLite<T> {
         return list;
     }
 
+    public List<Object> queryPagingDatas(Class table, String[] key, String[] value, int pageNumber, int pageSize,String orderBy) {
+        List<Object> list = new ArrayList<Object>();
+        String keys = "";
+        for (int i = 0; i < key.length; i++) {
+            if (i == key.length - 1) {
+                keys = keys + key[i] + "=?";
+            } else {
+                keys = keys + key[i] + "=?,";
+            }
+        }
+        String values = "";
+        for (int i = 0; i < value.length; i++) {
+            if (i == value.length - 1) {
+                values = values + value[i];
+            } else {
+                values = values + value[i] + ",";
+            }
+        }
+        String name = table.getSimpleName();
+        boolean tableName = table.isAnnotationPresent(TableNameInDB.class);
+        if (tableName) {
+            Annotation[] annotationses = table.getClass().getAnnotations();
+            name = ((TableNameInDB) annotationses[0]).value();
+        }
+        Cursor cursor = sqLiteDatabase.query(name, null,
+                keys,
+                new String[]{values}, null,
+                null,
+                orderBy,
+                pageNumber + "," + pageSize);
+        DBEntity dbEntity = Utils.getEntity(table);
+        while (cursor.moveToNext()) {
+            Object object = null;
+            try {
+                object = table.newInstance();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            for (int i = 0; i < dbEntity.getEntityColumns().size(); i++) {
+                try {
+                    EntityColumn entityColumn = dbEntity.getEntityColumns().get(i);
+                    Field field = table.getDeclaredField(entityColumn.getName());
+                    field.setAccessible(true);
+                    if (Utils.convertSQLType(entityColumn.getType()).equals("VARCHAR")) {
+                        if (entityColumn.getType().equals("long")) {
+                            field.set(object, cursor.getLong(cursor.getColumnIndex(entityColumn.getName())));
+                        } else if (entityColumn.getType().equals("float")) {
+                            field.set(object, cursor.getFloat(cursor.getColumnIndex(entityColumn.getName())));
+                        } else if (entityColumn.getType().equals("double")) {
+                            field.set(object, cursor.getDouble(cursor.getColumnIndex(entityColumn.getName())));
+                        } else if (entityColumn.getType().equals("boolean")) {
+                            field.set(object, cursor.getString(cursor.getColumnIndex(entityColumn.getName())).equals("1") ? true : false);
+                        } else {
+                            field.set(object, cursor.getString(cursor.getColumnIndex(entityColumn.getName())));
+                        }
+                    } else {
+                        field.set(object, cursor.getInt(cursor.getColumnIndex(entityColumn.getName())));
+                    }
+                } catch (NoSuchFieldException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+            list.add(object);
+        }
+        return list;
+    }
+
     public List<T> queryBlurryPagingDatas(Class<T> table, String key, String likeValue, int pageNumber, int pageSize) {
         List<T> list = new ArrayList<T>();
         String name = table.getSimpleName();
@@ -541,6 +723,61 @@ public class SmartSQLite<T> {
         return list;
     }
 
+    public List<T> queryBlurryPagingDatas(Class<T> table, String key, String likeValue, int pageNumber, int pageSize,String orderBy) {
+        List<T> list = new ArrayList<T>();
+        String name = table.getSimpleName();
+        boolean tableName = table.isAnnotationPresent(TableNameInDB.class);
+        if (tableName) {
+            Annotation[] annotationses = table.getAnnotations();
+            name = ((TableNameInDB) annotationses[0]).value();
+        }
+        Cursor cursor = sqLiteDatabase.query(name, null,
+                key + " like ?",
+                new String[]{"%" + likeValue + "%"}, null,
+                null,
+                orderBy,
+                pageNumber * pageSize + "," + pageSize);
+        DBEntity dbEntity = Utils.getEntity(table);
+        while (cursor.moveToNext()) {
+            T object = null;
+            try {
+                object = table.newInstance();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            for (int i = 0; i < dbEntity.getEntityColumns().size(); i++) {
+                try {
+                    EntityColumn entityColumn = dbEntity.getEntityColumns().get(i);
+                    Field field = table.getDeclaredField(entityColumn.getName());
+                    field.setAccessible(true);
+                    if (Utils.convertSQLType(entityColumn.getType()).equals("VARCHAR")) {
+                        if (entityColumn.getType().equals("long")) {
+                            field.set(object, cursor.getLong(cursor.getColumnIndex(entityColumn.getName())));
+                        } else if (entityColumn.getType().equals("float")) {
+                            field.set(object, cursor.getFloat(cursor.getColumnIndex(entityColumn.getName())));
+                        } else if (entityColumn.getType().equals("double")) {
+                            field.set(object, cursor.getDouble(cursor.getColumnIndex(entityColumn.getName())));
+                        } else if (entityColumn.getType().equals("boolean")) {
+                            field.set(object, cursor.getString(cursor.getColumnIndex(entityColumn.getName())).equals("1") ? true : false);
+                        } else {
+                            field.set(object, cursor.getString(cursor.getColumnIndex(entityColumn.getName())));
+                        }
+                    } else {
+                        field.set(object, cursor.getInt(cursor.getColumnIndex(entityColumn.getName())));
+                    }
+                } catch (NoSuchFieldException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+            list.add(object);
+        }
+        return list;
+    }
+
     public List<Object> getEntityDatas(Context context, Class table) {
         return SmartSQLite.getInstance(context).getDatas(table);
     }
@@ -550,6 +787,7 @@ public class SmartSQLite<T> {
         String sqlStructure = "";
         for (int i = 0; i < SmartConfig.classes.size(); i++) {
             String sql = Utils.getSQL(context.getPackageName() + "." + SmartConfig.ENTITY_PACKAGE + "." + SmartConfig.classes.get(i));
+            Log.i("info", "SQL:" + sql);
             if (i == 0) {
                 sqlStructure = sqlStructure + sql;
             } else {
@@ -559,6 +797,10 @@ public class SmartSQLite<T> {
         SmartConfig.sqlStructure = sqlStructure;
         Utils.mapSQL(context, sharedPreferences.getString(SmartConfig.sp_key, ""));
         sharedPreferences.edit().putString(SmartConfig.sp_key, sqlStructure).commit();
+    }
+
+    public void executeSQL(String sql) {
+        sqLiteDatabase.execSQL(sql);
     }
 
     public boolean isDbOpen() {

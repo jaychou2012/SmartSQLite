@@ -50,7 +50,7 @@ public class TableObject<T> {
                 fields) {
             try {
                 SmartLog.i("info", "属性：" + field.getName() + "  " + field.getType() + "  " + className + "  " + field.get(this));
-                if (!field.getName().equals("$change") && !field.getName().equals("serialVersionUID")) {
+                if (!field.getName().equals("$change") && !field.getName().equals("serialVersionUID") && !field.getName().equals("key_id")) {
                     DataEntity dataEntity = new DataEntity();
                     dataEntity.setName(field.getName());
                     dataEntity.setObject(field.get(this));

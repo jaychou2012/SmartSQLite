@@ -25,6 +25,7 @@ import com.tandong.smartsqlite.base.TableObject;
  * @date 2017-8-20
  */
 public class Student extends TableObject {
+    private int key_id;//如果需要自增id的话，可添加这个属性名，固定为key_id这个属性名
     private int id;
     private String name;
     private boolean high;
@@ -80,4 +81,11 @@ public class Student extends TableObject {
         this.timeDouble = timeDouble;
     }
 
+    public int getKey_id() {
+        return key_id;
+    }
+
+    public void setKey_id(int key_id) {
+        this.key_id = key_id;
+    }
 }

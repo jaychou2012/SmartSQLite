@@ -32,6 +32,7 @@ import java.util.List;
  */
 @TableNameInDB("TheTeacher")
 public class Teacher implements TableEntity<Teacher> {
+    private int key_id;//如果需要自增id的话，可添加这个属性名，固定为key_id这个属性名
     private int id;
     private String name;
 
@@ -49,6 +50,14 @@ public class Teacher implements TableEntity<Teacher> {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getKey_id() {
+        return key_id;
+    }
+
+    public void setKey_id(int key_id) {
+        this.key_id = key_id;
     }
 
     @Override
