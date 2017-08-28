@@ -27,7 +27,6 @@ SmartSQLite是一款强大的ORM数据库（对象关系映射，英语：Object
 # 即将支持
 
 *   自定义指定不存储在数据库中的属性名
-*   自定义指定排序字段
 *   数据库加密
 
     [最新及历史版本](https://github.com/jaychou2012/SmartSQLite/releases)
