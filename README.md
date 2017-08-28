@@ -20,6 +20,9 @@ SmartSQLite是一款强大的ORM数据库（对象关系映射，英语：Object
 * ✓ 自定义存储在数据库中的表名
 * ✓ 老版本数据库兼容或迁移
 * ✓ 自定义数据库存储路径
+* ✓ 支持自增ID，key_id
+* ✓ 支持执行SQL语句
+* ✓ 支持orderBy排序
 
 # 即将支持
 
@@ -52,7 +55,7 @@ allprojects {
 </pre></code>
 
 <pre><code>
-    compile 'com.github.jaychou2012:SmartSQLite:1.0.0.5'
+    compile 'com.github.jaychou2012:SmartSQLite:1.0.0.6'
 </pre></code>
 
 1.创建实体类，例如在entity文件夹新建一个Student类，只需继承TableObject，如果实体无法继承，请看Demo的第二种方案，实现接口TableEntity即可：
