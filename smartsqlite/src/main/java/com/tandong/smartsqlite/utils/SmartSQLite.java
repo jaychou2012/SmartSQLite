@@ -373,7 +373,7 @@ public class SmartSQLite<T> {
         return list;
     }
 
-    public List<Object> queryDatas(Class table, String key, String value,String orderBy) {
+    public List<Object> queryDatas(Class table, String key, String value, String orderBy) {
         List<Object> list = new ArrayList<Object>();
         String name = table.getSimpleName();
         boolean tableName = table.isAnnotationPresent(TableNameInDB.class);
@@ -382,7 +382,7 @@ public class SmartSQLite<T> {
             name = ((TableNameInDB) annotationses[0]).value();
         }
         Cursor cursor = sqLiteDatabase.rawQuery("select * from " + name + " where "
-                + key + "=? order by ?", new String[]{value,orderBy});
+                + key + "=? order by ?", new String[]{value, orderBy});
         DBEntity dbEntity = Utils.getEntity(table);
         while (cursor.moveToNext()) {
             Object object = null;
@@ -597,7 +597,7 @@ public class SmartSQLite<T> {
         return list;
     }
 
-    public List<Object> queryPagingDatas(Class table, String[] key, String[] value, int pageNumber, int pageSize,String orderBy) {
+    public List<Object> queryPagingDatas(Class table, String[] key, String[] value, int pageNumber, int pageSize, String orderBy) {
         List<Object> list = new ArrayList<Object>();
         String keys = "";
         for (int i = 0; i < key.length; i++) {
@@ -723,7 +723,7 @@ public class SmartSQLite<T> {
         return list;
     }
 
-    public List<T> queryBlurryPagingDatas(Class<T> table, String key, String likeValue, int pageNumber, int pageSize,String orderBy) {
+    public List<T> queryBlurryPagingDatas(Class<T> table, String key, String likeValue, int pageNumber, int pageSize, String orderBy) {
         List<T> list = new ArrayList<T>();
         String name = table.getSimpleName();
         boolean tableName = table.isAnnotationPresent(TableNameInDB.class);
@@ -784,6 +784,16 @@ public class SmartSQLite<T> {
 
     public static void initSmartSQLite(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(SmartConfig.sp_key, MODE_PRIVATE);
+        String path = SmartConfig.DB_PATH.length() == 0 ? context.getDatabasePath(SmartConfig.DB_NAME).getPath() : SmartConfig.DB_PATH + SmartConfig.DB_NAME;
+        Log.i("info", "数据处理：" + sharedPreferences.getBoolean("encrypt", false)+"  "+path);
+        if (sharedPreferences.getBoolean("encrypt", false)) {
+            SmartEncrypt.decrypt(path, new SmartEncrypt.CipherListener() {
+                @Override
+                public void onProgress(long current, long total) {
+
+                }
+            });
+        }
         String sqlStructure = "";
         for (int i = 0; i < SmartConfig.classes.size(); i++) {
             String sql = Utils.getSQL(context.getPackageName() + "." + SmartConfig.ENTITY_PACKAGE + "." + SmartConfig.classes.get(i));
@@ -796,7 +806,21 @@ public class SmartSQLite<T> {
         }
         SmartConfig.sqlStructure = sqlStructure;
         Utils.mapSQL(context, sharedPreferences.getString(SmartConfig.sp_key, ""));
-        sharedPreferences.edit().putString(SmartConfig.sp_key, sqlStructure).commit();
+        sharedPreferences.edit().putString(SmartConfig.sp_key, sqlStructure).apply();
+        sharedPreferences.edit().putBoolean("encrypt", SmartConfig.ENCRYPT).apply();
+    }
+
+    public static void SafeEntryClose(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(SmartConfig.sp_key, MODE_PRIVATE);
+        if (sharedPreferences.getBoolean("encrypt", false)) {
+            String path = SmartConfig.DB_PATH.length() == 0 ? context.getDatabasePath(SmartConfig.DB_NAME).getPath() : SmartConfig.DB_PATH + SmartConfig.DB_NAME;
+            SmartEncrypt.encrypt(path, new SmartEncrypt.CipherListener() {
+                @Override
+                public void onProgress(long current, long total) {
+
+                }
+            });
+        }
     }
 
     public void executeSQL(String sql) {

@@ -42,14 +42,15 @@ public class BaseApplication extends Application {
     private void initConfig() {
         SmartConfig.DB_NAME = "smartsqlite.db";//必填
         SmartConfig.DB_VERSION = 1;//选填，推荐写
-        SmartConfig.ENTITY_PACKAGE = "entity";//默认为entity
+        SmartConfig.ENTITY_PACKAGE = "entity";//必填，默认为entity
         SmartConfig.LOG = true;
-        SmartConfig.DB_PATH = Environment.getExternalStorageDirectory() + "/";//自定义数据库存储路径,反斜杠结尾
-        List<String> classNameList = new ArrayList<>();//数据库表集合，也就是实体类名称集合
+        SmartConfig.ENCRYPT = true;
+        SmartConfig.DB_PATH = Environment.getExternalStorageDirectory() + "/";//选填，自定义数据库存储路径,反斜杠结尾
+        List<String> classNameList = new ArrayList<>();//必填，数据库表集合，也就是实体类名称集合
         classNameList.add("Student");
         classNameList.add("Teacher");
-        SmartConfig.classes = classNameList;//赋值
-        SmartSQLite.initSmartSQLite(this);//自动初始化，全自动升级数据库，检测创建表，增加字段，删除表等
+        SmartConfig.classes = classNameList;//必填，赋值
+        SmartSQLite.initSmartSQLite(this);//必填，自动初始化，全自动升级数据库，检测创建表，增加字段，删除表等
     }
 
     @Override

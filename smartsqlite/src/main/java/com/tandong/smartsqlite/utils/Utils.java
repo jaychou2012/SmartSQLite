@@ -110,7 +110,6 @@ public class Utils {
             if (!field.getName().equals("$change") && !field.getName().equals("serialVersionUID")) {
                 EntityColumn entityColumn = new EntityColumn();
                 entityColumn.setType(field.getGenericType().toString());
-                SmartLog.i("info", "数据类型：" + field.getGenericType());
                 entityColumn.setName(field.getName());
                 entityColumns.add(entityColumn);
             }
